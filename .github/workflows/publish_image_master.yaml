@@ -2,15 +2,19 @@ name: 'publish image to Docker Hub'
 
 on:
   push:
-    branches:
-      - "master"
     tags:
-      - "v*"
+      - 'v[0-9]+(\.[0-9]+)*([-\.]\S+)?'
 
 jobs:
+  if: github.ref == 'refs/heads/master'
   docker:
     runs-on: ubuntu-latest
     steps:
+      -
+        name: 'Debug'
+        run: echo "$GITHUB_CONTEXT"
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
       -
         name: Checkout
         uses: actions/checkout@v4
@@ -48,6 +52,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
