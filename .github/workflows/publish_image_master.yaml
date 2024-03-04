@@ -3,7 +3,7 @@ name: 'Publish image'
 on:
   push:
     tags:
-      - '["v[0-9]+", "v[0-9]+.[0-9]+", "v[0-9]+.[0-9]+.[0-9]+", "v[0-9]+.[0-9]+.[0-9]+-*"]'
+      - 'v*'
 
 jobs:
 
@@ -16,6 +16,13 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+      -
+        name: Check Tag
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "match=true" >> $GITHUB_OUTPUT
+          fi
       -
         name: Checkout
         uses: actions/checkout@v4
@@ -51,6 +58,7 @@ jobs:
       -
         name: Build and push
         uses: docker/build-push-action@v5
+        if: steps.check-tag.outputs.match == 'true'
         with:
           context: .
           push: true
