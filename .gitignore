@@ -102,7 +102,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Docusaurus cache and generated files
 .docusaurus
@@ -134,7 +133,7 @@ dist
 /node_modules
 /.pnp
 .pnp.js
-.yarn/install-state.gz
+
 
 # testing
 /coverage
@@ -150,11 +149,6 @@ dist
 .DS_Store
 *.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # local env files
 .env*.local
 
@@ -162,5 +156,7 @@ yarn-error.log*
 .vercel
 
 # typescript
-*.tsbuildinfo
 next-env.d.ts
+
+#IDEA
+.idea
