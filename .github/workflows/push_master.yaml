@@ -1,0 +1,48 @@
+name: 'PR & Push on master'
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  FORCE_COLOR: true
+
+jobs:
+  test:
+    name: 'Test'
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      -
+        name: 'Checkout'
+        uses: actions/checkout@latest
+      -
+        name: 'Setup Node.js'
+        uses: actions/setup-node@latest
+        with:
+          node-version: '18'
+      -
+        name: 'Install dependencies'
+        run: npm install
+      -
+        name: 'Test'
+        run: npm test --if-present
+
+      -
+        name: 'Build'
+        run: npm run build
+      -
+        name: 'Build Docker Image'
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest .
+
+      -
+        name: 'Push Docker Image'
+        if: false
+        run: |
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_HUB_REPOSITORY }}:latest

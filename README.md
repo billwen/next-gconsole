@@ -36,3 +36,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Create a database
+```SQL
+CREATE DATABASE "next-gconsole-dev"
+    WITH
+    OWNER = billwen
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.utf8'
+    LC_CTYPE = 'en_US.utf8'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+
+GRANT TEMPORARY, CONNECT ON DATABASE "next-gconsole-dev" TO PUBLIC;
+
+GRANT ALL ON DATABASE "next-gconsole-dev" TO billwen;
+
+GRANT ALL ON DATABASE "next-gconsole-dev" TO "gconsole-dev";
+```
