@@ -1,23 +1,32 @@
 import {PrismaClient} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
+/**
+ * Role table
+ */
+const builtInRoles = [
+  {
+    id: 1,
+    name: "sysadmin",
+    displayName: "System admin",
+    description: "Admin role for whole system",
+    builtIn: true
+  }, {
+    id: 2,
+    name: "user",
+    displayName: "User",
+    description: "User role for the system, can only login",
+    builtIn: true
+  }
+];
+
 const prisma = new PrismaClient();
 
 const seedData = async (prisma: PrismaClient) => {
 
   // Added role data
   await prisma.role.createMany({
-    data: [{
-      name: "sysadmin",
-      displayName: "System admin",
-      description: "Admin role for whole system",
-      factoryRole: true
-    }, {
-      name: "user",
-      displayName: "User",
-      description: "User role for the system, can only login",
-      factoryRole: true
-    }],
+    data: builtInRoles
   });
 
   // Create system admin
@@ -26,7 +35,7 @@ const seedData = async (prisma: PrismaClient) => {
   await prisma.user.create({
     data: {
       username: "admin",
-      factoryUser: true,
+      builtIn: true,
       givenName: "System",
       familyName: "Admin",
       password,
@@ -37,8 +46,13 @@ const seedData = async (prisma: PrismaClient) => {
       expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
       passwordExpires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
       roles: {
-        connect: {
-          id: 1
+        create: {
+          assignedByUsername: "admin",
+          role: {
+            connect: {
+              id: 1
+            }
+          }
         }
       }
     }

@@ -1,14 +1,14 @@
 import NextAuth from "next-auth";
 import GitHub from "@auth/core/providers/github";
-import {PrismaClient} from "@prisma/client";
-import {PrismaAdapter} from "@auth/prisma-adapter";
-
-const sharedPrismaClient = new PrismaClient();
+import AccountManagementAdapter from "@/services/accountManagementAdapter";
 
 export const {
   handlers: {GET, POST},
   auth
 } = NextAuth({
-  adapter: PrismaAdapter(sharedPrismaClient),
+  adapter: AccountManagementAdapter(),
+  session: {
+    strategy: "jwt",
+  },
   providers: [GitHub],
 });

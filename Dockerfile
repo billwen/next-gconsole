@@ -64,6 +64,11 @@ EXPOSE 8080
 ENV PORT 8080
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
+ENV DATABASE_URL "postgres://postgres:postgres@localhost:5432/postgres?schema=public"
+ENV GOOGLE_CLIENT_ID "YOUR_GOOGLE_CLIENT_ID"
+ENV GOOGLE_CLIENT_SECRET "YOUR_GOOGLE_CLIENT_SECRET"
+ENV GITHUB_CLIENT_ID "YOUR_GITHUB_CLIENT_ID"
+ENV GITHUB_CLIENT_SECRET "YOUR_GITHUB_CLIENT_SECRET"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
