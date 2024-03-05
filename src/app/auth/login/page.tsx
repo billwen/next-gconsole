@@ -2,7 +2,7 @@ import {AuthenticationForm} from "@/components/auth/AuthenticationForm";
 
 const LoginPage = () => {
   return (
-    <AuthenticationForm/>
+    <AuthenticationForm formTitle="Login" showOauth/>
   );
 };
 

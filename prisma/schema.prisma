@@ -66,10 +66,11 @@ model User {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  image     String?
-  imageData Bytes?    @map("image_data")
-  accounts  Account[]
-  sessions  Session[]
+  avatarUrl  String? @map("avatar_url")
+  avatarData Bytes?  @map("avatar_data")
+
+  accounts Account[]
+  sessions Session[]
 
   // M-N relations
   roles UsersOnRoles[]

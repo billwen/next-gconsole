@@ -38,7 +38,7 @@ const apiAuthPrefix: string = "/api/auth";
 const DEFAULT_LOGIN_REDIRECT: string = "/settings";
 
 const middleware = auth( (req) => {
-  console.log(`[${req.auth?.user?.id || 'anonymous'}] ${req.method}: ${req.nextUrl.pathname} `);
+  console.log(`[${req.auth?.user?.id || 'anonymous'}] ${req.method}: ${req.nextUrl.pathname} - ${JSON.stringify(req)}`);
 
   const {nextUrl} = req;
   const isLoggedIn = !!req.auth;
