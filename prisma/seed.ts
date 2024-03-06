@@ -4,6 +4,7 @@ import {Prisma, PrismaClient} from "@prisma/client";
 import PermissionUncheckedCreateInput = Prisma.PermissionUncheckedCreateInput;
 import RoleCreateInput = Prisma.RoleCreateInput;
 import RoleUncheckedCreateInput = Prisma.RoleUncheckedCreateInput;
+import RolePermissionUncheckedCreateNestedManyWithoutRoleInput = Prisma.RolePermissionUncheckedCreateNestedManyWithoutRoleInput;
 
 
 /**
@@ -58,69 +59,79 @@ const prisma = new PrismaClient();
 const seedData = async (prisma: PrismaClient) => {
 
   // Added permission data
-  builtInPermissions.map(async (permission) => {
-    console.log("Creating permission", permission);
+  let p = builtInPermissions.map(async (permission) => {
     await prisma.permission.create({
       data: {
         ...permission
       }
     });
+
+  });
+  let result = await Promise.allSettled(p);
+  result.forEach(r => {
+    if (r.status === 'rejected') {
+      console.log(`Apply seed failed.`)
+      throw new Error(`Creating permission table failed, reason ${r.reason}`)
+    }
   });
 
   // Create roles based on permissions
-  // builtInRoles.map(async (role) => {
-  //   const {permissionsIds, ...roleData} = role as BuiltInRole;
-  //   const ps: any[] = [];
-  //   permissionsIds.forEach((id) => {
-  //     const newPermission = {
-  //       create: {
-  //         permission: {
-  //           connect: {
-  //             id
-  //           }
-  //         }
-  //       }
-  //     };
-  //     ps.push(newPermission);
-  //   });
-  //
-  //   await prisma.role.create({
-  //     data: {
-  //       ...roleData,
-  //       permissions: ps
-  //     } as Role
-  //   });
-  // });
+  const p2 = builtInRoles.map(async (role) => {
+    const {permissionsIds, ...roleData} = role as BuiltInRole;
+    const ps: any[] = [];
+    permissionsIds.forEach((id) => {
+      const newPermission = {
+        permission: {
+          connect: {
+            id
+          }
+        }
+      };
+      ps.push(newPermission);
+    });
+
+    await prisma.role.create({
+      data: {
+        ...roleData,
+        permissions: {
+          create: ps
+        } as RolePermissionUncheckedCreateNestedManyWithoutRoleInput
+      }
+    });
+  });
+
+  await Promise.all(p2);
 
   // Create system admin
-  // const salt = await bcrypt.genSalt();
-  // const password = await bcrypt.hash("admin", salt);
-  // await prisma.user.create({
-  //   data: {
-  //     username: "admin",
-  //     builtIn: true,
-  //     givenName: "System",
-  //     familyName: "Admin",
-  //     password,
-  //     salt,
-  //     email: "admin@localhost",
-  //     emailVerified: new Date(),
-  //     enabled: true,
-  //     expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
-  //     passwordExpires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
-  //     roles: {
-  //       create: {
-  //         assignedByUsername: "admin",
-  //         role: {
-  //           connect: {
-  //             id: 1
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // });
+  const salt = await bcrypt.genSalt();
+  const password = await bcrypt.hash("admin", salt);
+  await prisma.user.create({
+    data: {
+      username: "admin",
+      builtIn: true,
+      givenName: "System",
+      familyName: "Admin",
+      password,
+      salt,
+      email: "admin@localhost",
+      emailVerified: new Date(),
+      enabled: true,
+      expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
+      passwordExpires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365 * 1000),
+      roles: {
+        create: {
+          assignedByUsername: "admin",
+          role: {
+            connect: {
+              id: 1
+            }
+          }
+        }
+      }
+    }
+  });
 
+  // Done
 };
 
 (async () => {

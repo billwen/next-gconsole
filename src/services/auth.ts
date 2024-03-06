@@ -1,9 +1,9 @@
 import {nanoid} from 'nanoid';
 import NextAuth from "next-auth";
 import GitHub from "@auth/core/providers/github";
-import AccountManagementAdapter from "@/services/accountManagementAdapter";
 
-import {ds} from "@/services/db";
+import {ds} from "@/services/data-service";
+import AccountManagementAdapter from "@/services/account-management-adapter";
 
 export const {
   handlers: {GET, POST},
