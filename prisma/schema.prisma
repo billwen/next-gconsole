@@ -75,6 +75,8 @@ model User {
   // M-N relations
   roles UsersOnRoles[]
 
+  events AuditLog[]
+
   @@map("users")
 }
 
@@ -87,29 +89,93 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+//
+// Hierarchical RBAC (Role Based Access Control) tables
+//
 model Role {
-  id          Int            @id @default(autoincrement())
-  name        String         @unique
-  displayName String         @map("display_name")
-  builtIn     Boolean        @default(false)
+  id Int @id @default(autoincrement())
+
+  slug     String @unique
+  name     String
+  // parent role, NULL means top level
+  parentId Int?   @map("parent_id")
+
   description String?
+  builtIn     Boolean  @default(false) @map("built_in")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // relationship
+  parentRole  Role?            @relation("ParentRole", fields: [parentId], references: [id])
+  childRoles  Role[]           @relation("ParentRole")
   users       UsersOnRoles[]
+  permissions RolePermission[]
 
   @@map("roles")
 }
 
-model UsersOnRoles {
+model Permission {
   id Int @id @default(autoincrement())
 
-  // relation scalar filed with the USER table
-  userId String @map("user_id")
-  user   User   @relation(fields: [userId], references: [id])
+  slug    String @unique
+  module  String
+  feature String
+  name    String
 
-  roleId Int  @map("role_id")
-  role   Role @relation(fields: [roleId], references: [id])
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  assignedAt         DateTime @default(now()) @map("assigned_at")
-  assignedByUsername String?  @map("assigned_by_username")
+  // relationship
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+// Permission and Role M-N relation table
+model RolePermission {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UsersOnRoles {
+  id         Int      @id @default(autoincrement())
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  userId             String  @map("user_id")
+  roleId             Int     @map("role_id")
+  assignedByUsername String? @map("assigned_by_username")
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
 
   @@map("users_on_roles")
+}
+
+//
+// Logs of audit
+//
+model AuditLog {
+  username   String
+  userId     String
+  eventTs    DateTime @map("event_ts")
+  system     String
+  module     String
+  event      String
+  eventValue String
+  details    Json?
+
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
 }
