@@ -7,6 +7,8 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["relationJoins"]
+  engineType = "library"
+  binaryTargets = ["native"]
 }
 
 datasource db {

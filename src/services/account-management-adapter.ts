@@ -1,12 +1,11 @@
-import {PrismaClient, User, VerificationToken} from "@prisma/client";
+import { User, VerificationToken} from "@prisma/client/edge";
 import {PrismaAdapter} from "@auth/prisma-adapter";
 import {Adapter, AdapterAccount, AdapterAuthenticator, AdapterSession, AdapterUser} from "@auth/core/adapters";
 import {DataService} from "@/services/data-service";
 import {Awaitable} from "@auth/core/types";
 
 export default function AccountManagementAdapter(usingDataService: DataService): Adapter {
-  const sharedPrismaClient = new PrismaClient();
-  const adapter = PrismaAdapter(sharedPrismaClient);
+  const adapter = PrismaAdapter(usingDataService.db);
 
   const ds = usingDataService;
 
@@ -32,7 +31,7 @@ export default function AccountManagementAdapter(usingDataService: DataService):
       throw new Error('Adapter.getUserByEmail is null');
     },
     getUserByAccount(providerAccountId: Pick<AdapterAccount, "provider" | "providerAccountId">): Awaitable<AdapterUser | null> {
-      console.log(`getting user by account id ${providerAccountId}`);
+      console.log(`getting user by account id ${JSON.stringify(providerAccountId)}`);
       if (adapter.getUserByAccount) {
         return adapter.getUserByAccount(providerAccountId);
       }

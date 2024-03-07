@@ -13,6 +13,7 @@ export const {
   session: {
     strategy: "jwt",
   },
+  secret: process.env.GCONSOLE_AUTH_SECRET,
   providers: [GitHub({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,

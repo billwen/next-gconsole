@@ -1,4 +1,4 @@
-import {Permission, PrismaClient, User} from "@prisma/client/edge";
+import {Permission, PrismaClient, User} from "@prisma/client";
 
 const buildUserPermissions = async (fromDb: PrismaClient) => {
   console.log('Building up auth');
@@ -88,6 +88,7 @@ const createDataService = () => {
   };
 
   return {
+    db,
     getUserPermissions,
     createDefaultUser
   };
