@@ -1,4 +1,5 @@
 import {auth} from "@/services/auth";
+import {settings} from "@/setting";
 
 /**
  * An array of routes that are public and do not require authentication.
@@ -31,12 +32,6 @@ const onlyUnauthenticatedAccessRoutes: string[] = [
  */
 const apiAuthPrefix: string = "/api/auth";
 
-/**
- * The default redirect path after a successful login.
- * @type {string}
- */
-const DEFAULT_LOGIN_REDIRECT: string = "/settings";
-
 const middleware = auth( (req) => {
   console.log(`[${req.auth?.user?.id || 'anonymous'}] ${req.method}: ${req.nextUrl.pathname} - ${JSON.stringify(req)}`);
 
@@ -52,7 +47,7 @@ const middleware = auth( (req) => {
   if (onlyUnauthenticatedAccessRoutes.includes(nextUrl.pathname)) {
     // If the user is already authenticated, redirect to the default login redirect path
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl)) ;
+      return Response.redirect(new URL(settings.route.defaultLoginRedirectUrl, nextUrl));
     }
     return;
   }
